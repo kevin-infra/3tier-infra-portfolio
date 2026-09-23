@@ -1,0 +1,50 @@
+---
+- name: Zabbix Agent2 설치 및 설정
+  hosts: web,was,db,lb
+  tasks:
+
+    - name: Zabbix 레포지토리 파일 생성
+      copy:
+        dest: /etc/yum.repos.d/zabbix.repo
+        content: |
+          [zabbix]
+          name=Zabbix Official Repository - aarch64
+          baseurl=https://repo.zabbix.com/zabbix/7.0/rocky/10/aarch64/
+          enabled=1
+          gpgcheck=0
+
+    - name: zabbix-agent2 패키지 설치
+      dnf:
+        name: zabbix-agent2
+        state: present
+
+    - name: Server 설정 (모니터링 서버 IP)
+      lineinfile:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: '^Server='
+        line: 'Server=192.168.56.23'
+
+    - name: ServerActive 설정 (모니터링 서버 IP)
+      lineinfile:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: '^ServerActive='
+        line: 'ServerActive=192.168.56.23'
+
+    - name: Hostname 설정
+      lineinfile:
+        path: /etc/zabbix/zabbix_agent2.conf
+        regexp: '^Hostname='
+        line: 'Hostname={{ inventory_hostname }}'
+
+    - name: 방화벽 10050 포트 오픈
+      firewalld:
+        port: 10050/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: zabbix-agent2 서비스 시작 및 활성화
+      service:
+        name: zabbix-agent2
+        state: started
+        enabled: yes
