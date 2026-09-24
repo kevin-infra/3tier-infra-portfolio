@@ -8,6 +8,8 @@ Vagrant.configure("2") do |config|
     web01.vm.network "private_network", ip: "192.168.56.20", auto_config: false
     web01.vm.network "private_network", ip: "10.10.10.11", auto_config: false
     web01.vm.network "private_network", ip: "10.10.20.11", auto_config: false
+    web01.vm.network "private_network", ip: "10.10.90.12", auto_config: false
+    web01.vm.network "private_network", ip: "10.10.90.11", auto_config: false
     web01.vm.disk :disk, size: "5GB", name: "extra_disk"
     web01.vm.provider "virtualbox" do |vb|
       vb.name = "web01"
